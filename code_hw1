@@ -1,0 +1,86 @@
+import random
+import unittest
+
+def calculate_mean(threat_scores):
+    return sum(threat_scores) / len(threat_scores)
+
+def aggregate_threat_score(department_data):
+    """
+    department_data: List of dictionaries with keys 'mean_score', 'num_users', 'importance'
+    """
+    weighted_sum = 0
+    total_weight = 0
+
+    for dept in department_data:
+        mean_score = dept['mean_score']
+        num_users = dept['num_users']
+        importance = dept['importance']
+
+        weighted_sum += mean_score * num_users * importance
+        total_weight += num_users * importance
+
+    if total_weight == 0:
+        return 0
+
+    return round(weighted_sum / total_weight, 2)
+
+class TestThreatScoreCalculation(unittest.TestCase):
+
+    def test_single_department(self):
+        # One department, mean threat score of 50, 100 users, importance 3
+        department_data = [{'mean_score': 50, 'num_users': 100, 'importance': 3}]
+        self.assertEqual(aggregate_threat_score(department_data), 50)
+
+    def test_multiple_departments_equal_importance(self):
+        # Two departments with equal importance
+        department_data = [
+            {'mean_score': 30, 'num_users': 50, 'importance': 2},
+            {'mean_score': 70, 'num_users': 50, 'importance': 2}
+        ]
+        # Average should be 50
+        self.assertEqual(aggregate_threat_score(department_data), 50)
+
+    def test_varying_importance(self):
+        # Varying importance for departments
+        department_data = [
+            {'mean_score': 20, 'num_users': 100, 'importance': 1},
+            {'mean_score': 80, 'num_users': 50, 'importance': 5}
+        ]
+        # Heavily weighted towards the second department
+        self.assertAlmostEqual(aggregate_threat_score(department_data), 56.0, places=1)
+
+    def test_outlier_department(self):
+        # One department with an extremely high mean score
+        department_data = [
+            {'mean_score': 10, 'num_users': 150, 'importance': 3},
+            {'mean_score': 90, 'num_users': 10, 'importance': 3}
+        ]
+        # Outlier department should not overly skew the result
+        self.assertAlmostEqual(aggregate_threat_score(department_data), 17.8, places=1)
+
+    def test_zero_users(self):
+        # Department with zero users should not affect the result
+        department_data = [
+            {'mean_score': 50, 'num_users': 0, 'importance': 3},
+            {'mean_score': 30, 'num_users': 50, 'importance': 2}
+        ]
+        self.assertEqual(aggregate_threat_score(department_data), 30)
+
+    def test_all_zero_scores(self):
+        # All mean scores are zero
+        department_data = [
+            {'mean_score': 0, 'num_users': 100, 'importance': 1},
+            {'mean_score': 0, 'num_users': 100, 'importance': 5}
+        ]
+        self.assertEqual(aggregate_threat_score(department_data), 0)
+
+    def test_large_sample_size(self):
+        # Large number of users with varying importance
+        department_data = [
+            {'mean_score': 40, 'num_users': 1000, 'importance': 3},
+            {'mean_score': 60, 'num_users': 500, 'importance': 5}
+        ]
+        self.assertAlmostEqual(aggregate_threat_score(department_data), 48.0, places=1)
+
+if __name__ == '__main__':
+    unittest.main()
