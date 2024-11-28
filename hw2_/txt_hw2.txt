@@ -1,0 +1,5 @@
+more than 55 is like some условный(conditional) metrics, and how much is max_threat_user getting out of the normal(in my case its conditional metric 55) thats keep escalating its total threat level 55+ ( max -70)
+насколько больше 55 но - 70 это баланс, потому что есть еще другие элементы и надо было забалансить
+55is our trigger(more than we can accept)
+каждая компания наверно будет сама выбирать что приемлимо
+примерно таже архитектура но замена key (importance) на threat лвл и другие тест кейсы
